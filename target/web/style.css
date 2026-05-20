@@ -1,0 +1,359 @@
+/* ox_target — single inventory-style dot + option tree
+   Palette aligned with ox_inventory "Underworld Dossier" (web/src/index.scss). */
+
+:root {
+  /* Mirrors ox_inventory "Underworld Dossier" tokens (web/src/index.scss) */
+  --inv-amber:        #ffaa1a;
+  --inv-amber-bright: #ffbe4d;
+  --inv-amber-soft:   rgba(255, 170, 26, 0.22);
+  --inv-amber-glow:   rgba(255, 170, 26, 0.55);
+  --inv-amber-warm:   #ffd078;
+  --inv-amber-deep:   #c8800f;
+  --inv-blood:        #d6353b;
+  --inv-bone:         #ece4d2;
+  --inv-bone-muted:   #8d8675;
+  --inv-bone-dim:     rgba(220, 210, 188, 0.62);
+
+  --tg-amber: var(--inv-amber);
+  --tg-amber-bright: var(--inv-amber-bright);
+  --tg-amber-soft: var(--inv-amber-soft);
+  --tg-amber-glow: var(--inv-amber-glow);
+  --tg-amber-warm: var(--inv-amber-warm);
+  --tg-amber-deep: var(--inv-amber-deep);
+  --tg-blood: var(--inv-blood);
+  --tg-bone: var(--inv-bone);
+  --tg-bone-muted: var(--inv-bone-muted);
+  --tg-bone-dim: var(--inv-bone-dim);
+
+  --tg-border:        rgba(255, 170, 26, 0.22);
+  --tg-border-strong: rgba(255, 170, 26, 0.42);
+  --tg-bg-deep: rgba(10, 9, 7, 0.96);
+  --tg-bg-mid:  rgba(16, 14, 11, 0.94);
+  --tg-bg-top:  rgba(28, 24, 18, 0.94);
+  --tg-edge:    rgba(255, 210, 134, 0.09);
+  --tg-shadow:  rgba(0, 0, 0, 0.5);
+  --tg-soft-shadow: rgba(0, 0, 0, 0.28);
+
+  --tg-trunk-x:    10px;
+  --tg-node-size:  5px;
+  --tg-branch-len: 14px;
+  --tg-row-gap:    4pt;
+}
+
+/* ── Reset / body ─────────────────────────────────────────────────────── */
+
+body {
+  visibility: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  margin: 0;
+  overflow: hidden;
+  font-family: Bahnschrift, Tahoma, 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+p { margin: 0; }
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 40;
+}
+
+/* ── Keyframes ────────────────────────────────────────────────────────── */
+
+@keyframes tg-dot-breathe {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes tg-line-grow-y     { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+@keyframes tg-line-grow-x     { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+@keyframes tg-option-in       { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes tg-node-pop {
+  0%   { transform: translate(-50%, -50%) scale(0); }
+  60%  { transform: translate(-50%, -50%) scale(1.35); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #eyeDot { animation: none !important; }
+  #options-wrapper { transition: none !important; }
+  #options-wrapper::before,
+  #options-wrapper::after,
+  .option-container,
+  .option-container::before,
+  .option-container::after { animation: none !important; transition: none !important; }
+}
+
+/*
+ * Branch tree (+ trunk lines): only when at least one option mounts.
+ * Reticle stays visible while targeting so the crosshair cannot disappear entirely.
+ */
+#options-wrapper {
+  opacity: 0;
+  transition: opacity 0.13s ease;
+  pointer-events: none;
+}
+
+#options-wrapper:not(:empty) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#options-wrapper:empty {
+  display: none;
+}
+
+/* ── Target dot (single reticle — matches ox_inventory accent nodes) ─── */
+
+#eye {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+#eyeDot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 32% 32%,
+    rgba(236, 228, 210, 0.95) 0%,
+    var(--inv-bone-muted) 42%,
+    rgba(77, 71, 56, 0.95) 100%
+  );
+  border: 1px solid rgba(220, 210, 188, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 0 8px rgba(255, 170, 26, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+  transition:
+    width 160ms ease,
+    height 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 180ms ease,
+    transform 160ms ease;
+}
+
+#eyeDot.eye-hover {
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--inv-amber-warm) 0%,
+    var(--inv-amber) 55%,
+    var(--inv-amber-deep) 100%
+  );
+  border-color: rgba(255, 220, 160, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(255, 220, 160, 0.28),
+    0 0 10px var(--inv-amber-glow),
+    0 0 22px var(--inv-amber-soft),
+    0 2px 8px rgba(0, 0, 0, 0.62);
+  animation: tg-dot-breathe 1.35s ease-in-out infinite;
+}
+
+/* ── Tree wrapper ─────────────────────────────────────────────────────── */
+
+#options-wrapper {
+  position: absolute;
+  top: calc(50% - 3pt);
+  left: calc(50% + 18pt);
+  padding: 0 0 0 calc(var(--tg-trunk-x) + var(--tg-branch-len) + 5px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tg-row-gap);
+}
+
+/* Vertical trunk */
+#options-wrapper::before {
+  content: '';
+  position: absolute;
+  left: var(--tg-trunk-x);
+  top: 3px;
+  bottom: 3px;
+  width: 1.25px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--tg-border-strong) 75%, transparent) 10%,
+    var(--tg-border-strong) 50%,
+    color-mix(in srgb, var(--tg-border-strong) 75%, transparent) 90%,
+    transparent 100%
+  );
+  border-radius: 2px;
+  pointer-events: none;
+  transform-origin: top center;
+  animation: tg-line-grow-y 220ms ease-out forwards;
+}
+
+/* Connector from reticle to trunk */
+#options-wrapper::after {
+  content: '';
+  position: absolute;
+  left: -12pt;
+  top: 50%;
+  width: calc(var(--tg-trunk-x) + 12pt);
+  height: 1.25px;
+  background: linear-gradient(90deg, var(--tg-amber-soft) 0%, var(--tg-border-strong) 100%);
+  border-radius: 2px;
+  pointer-events: none;
+  transform-origin: left center;
+  animation: tg-line-grow-x 200ms ease-out 60ms both;
+}
+
+/* ── Options ──────────────────────────────────────────────────────────── */
+
+.option-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--tg-bone-muted);
+
+  font-size: 10pt;
+  line-height: 20pt;
+  vertical-align: middle;
+  min-height: 26pt;
+  width: 160pt;
+  padding: 3px 12px 3px 13px;
+  margin: 0;
+
+  border: 1px solid var(--tg-border);
+  background:
+    linear-gradient(180deg, var(--tg-edge) 0%, transparent 30%),
+    linear-gradient(168deg, var(--tg-bg-top) 0%, var(--tg-bg-mid) 55%, var(--tg-bg-deep) 100%);
+  box-shadow:
+    0 8px 16px var(--tg-soft-shadow),
+    inset 0 1px 0 rgba(255, 220, 160, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+
+  clip-path: polygon(0 5px, 5px 0, 100% 0, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+  animation: tg-option-in 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  transition:
+    color 140ms ease,
+    border-color 160ms ease,
+    transform 130ms ease,
+    box-shadow 150ms ease,
+    background 160ms ease,
+    filter 140ms ease;
+}
+
+/* Subtle stagger (lighter than before) */
+.option-container:nth-child(1) { animation-delay: 48ms; }
+.option-container:nth-child(2) { animation-delay: 78ms; }
+.option-container:nth-child(3) { animation-delay: 108ms; }
+.option-container:nth-child(4) { animation-delay: 138ms; }
+.option-container:nth-child(5) { animation-delay: 168ms; }
+.option-container:nth-child(6) { animation-delay: 198ms; }
+.option-container:nth-child(7) { animation-delay: 228ms; }
+.option-container:nth-child(n + 8) { animation-delay: 258ms; }
+
+/* Horizontal branch (twig) */
+.option-container::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * (var(--tg-branch-len) + 3px));
+  top: 50%;
+  width: var(--tg-branch-len);
+  height: 1.25px;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    var(--tg-border) 0%,
+    var(--tg-border-strong) 100%
+  );
+  border-radius: 2px;
+  pointer-events: none;
+  transform-origin: left center;
+  animation: tg-line-grow-x 130ms ease-out both;
+  animation-delay: inherit;
+}
+
+/* Connector node (small amber dot) */
+.option-container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--tg-node-size);
+  height: var(--tg-node-size);
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #ffd078 0%, var(--tg-amber) 55%, var(--tg-amber-deep) 100%);
+  border: 1px solid rgba(255, 220, 160, 0.35);
+  box-shadow: 0 0 8px rgba(255, 170, 26, 0.32);
+  pointer-events: none;
+  transition: transform 160ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+
+.option-container:hover {
+  color: var(--tg-bone);
+  border-color: var(--tg-border-strong);
+  background:
+    linear-gradient(90deg, rgba(255, 170, 26, 0.12) 0%, transparent 72%),
+    linear-gradient(180deg, rgba(255, 210, 134, 0.12) 0%, transparent 28%),
+    linear-gradient(168deg, rgba(28, 25, 20, 0.97) 0%, rgba(16, 14, 12, 0.99) 100%);
+  box-shadow:
+    0 12px 24px var(--tg-shadow),
+    0 0 16px rgba(255, 170, 26, 0.16),
+    inset 0 1px 0 rgba(255, 220, 160, 0.05);
+  transform: translateX(2px);
+  filter: saturate(1.03);
+}
+
+.option-container:hover::before {
+  background: linear-gradient(90deg, var(--tg-border-strong) 0%, var(--tg-amber-warm) 100%);
+}
+
+.option-container:hover::after {
+  transform: translate(-50%, -50%) scale(1.28);
+  box-shadow: 0 0 12px rgba(255, 170, 26, 0.58);
+}
+
+.option-container:active::after { animation: tg-node-pop 200ms ease-out; }
+.option-container:active        { transform: translateX(1px); filter: brightness(0.95) saturate(0.95); }
+
+/* ── Icon + label ─────────────────────────────────────────────────────── */
+
+.option-icon {
+  font-size: 11pt;
+  line-height: 20pt;
+  width: 14pt;
+  margin: 1pt 7pt 1pt 0;
+  color: #ffb846;
+  text-shadow: 0 0 7px rgba(255, 170, 26, 0.2);
+  transition: color 140ms ease, text-shadow 160ms ease;
+}
+
+.option-container:hover .option-icon {
+  color: var(--tg-amber-warm);
+  text-shadow: 0 0 10px rgba(255, 170, 26, 0.45);
+}
+
+.option-label {
+  font-weight: 650;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  font-size: 9.75pt;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
+  max-width: 125pt;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

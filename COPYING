@@ -1,0 +1,18 @@
+ox_enhanced — licensing pointer
+================================
+
+This repository contains multiple programs. Each is under GNU GPL version 3
+(or later) where noted in that program's LICENSE file.
+
+  inventory/LICENSE
+  target/LICENSE
+  doorlock/LICENSE
+  w2f_adminspawner/LICENSE
+
+Pack-wide GPL-3.0 compliance (including doorlock UI Corresponding Source):
+
+  GPL-3.0-NOTICE.md
+
+The full text of GPL-3.0 is in each LICENSE file above, or at:
+
+  https://www.gnu.org/licenses/gpl-3.0.html

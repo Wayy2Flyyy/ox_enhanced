@@ -1,0 +1,26 @@
+GPL-3.0 Written Offer — doorlock NUI Corresponding Source
+=========================================================
+
+This resource (doorlock, based on ox_doorlock) is licensed under the GNU General
+Public License version 3. The minified files in doorlock/web/build/ are object
+code. Corresponding Source for that UI is not stored in the Wayy2Flyyy/ox_enhanced
+repository.
+
+For at least three years after the last conveyance of object code, we will
+provide the Corresponding Source to anyone who requests it. That source is the
+web/ directory from communityox/ox_doorlock tag v1.22.0 (or the tag matching
+the doorlock version in fxmanifest.lua), which you can also obtain directly:
+
+  https://github.com/communityox/ox_doorlock/tree/v1.22.0/web
+
+To request a copy through this written offer, open an issue at:
+
+  https://github.com/Wayy2Flyyy/ox_enhanced/issues
+
+or contact the repository maintainer (Wayy2Flyyy) with the subject
+"GPL doorlock UI source request". We will respond with the upstream location
+and/or an archive of the matching web/ source tree at no charge beyond the cost
+of physically performing the distribution (if any).
+
+This offer is made by the redistributor of this modified work (W2F / Wayy2Flyyy)
+in compliance with GNU GPL version 3, section 6(b).
