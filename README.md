@@ -5,7 +5,7 @@
 <img width="1122" height="1402" alt="image" src="https://github.com/user-attachments/assets/25bea79d-d6c2-40e2-8846-f6a5507a3d35" />
 
 
-It brings together (folder names **in this repo** — no `ox_` prefix):
+It brings together:
 
 - `inventory` — enhanced inventory (fork of ox_inventory)
 - `target` — enhanced targeting (fork of ox_target)
