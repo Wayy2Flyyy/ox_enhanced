@@ -19,7 +19,6 @@ Full license text: [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.html). Copi
 
 **On your FiveM server**, rename `inventory` → `ox_inventory`, `target` → `ox_target`, `doorlock` → `ox_doorlock` under `resources/[ox]/` (see README). Repo paths above use unprefixed folder names.
 
-**Dependencies (not part of this repo):** `ox_lib` and `oxmysql` remain separate upstream projects under their own licenses.
 
 ---
 
